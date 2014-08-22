@@ -479,6 +479,7 @@ begin
   Updater.CurrentVersion := Caption;
   Updater.VersionIndexURI := UpdUrl;
   Updater.UpdateInterval := 60000;
+  Updater.LogFilename := LogFile;
   Updater.SelfTimer := true;
 end;
 
