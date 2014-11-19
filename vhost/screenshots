@@ -1,0 +1,52 @@
+Listen 8102
+NameVirtualHost *:8102
+<VirtualHost *:8102>
+<Directory "/usr/local/screenshots/html">
+    # secure login ...
+    AuthType Basic
+    
+    # ** INFORMATION ** Users digest file enabled ...
+    AuthName "Screenshots"
+    AuthUserFile /usr/local/etc/pwd.file
+                                
+    Require valid-user
+    AllowOverride All
+    Options -Indexes
+</Directory>
+
+Alias /screenshots/ /mnt/kmotion/screenshots/
+<Directory "/mnt/kmotion/screenshots/">
+    # secure login ...
+    AuthType Basic
+    
+    # ** INFORMATION ** Users digest file enabled ...
+    AuthName "Screenshots"
+    AuthUserFile /usr/local/etc/pwd.file
+                                
+    Require valid-user
+    AllowOverride none
+    Options -Indexes
+</Directory>
+
+Alias /ramdisk/ /dev/shm/screenshots/
+<Directory "/dev/shm/screenshots/">
+    # secure login ...
+    AuthType Basic
+    
+    # ** INFORMATION ** Users digest file enabled ...
+    AuthName "Screenshots"
+    AuthUserFile /usr/local/etc/pwd.file
+                                
+    Require valid-user
+    AllowOverride none
+    Options -Indexes
+</Directory>
+
+
+DocumentRoot /usr/local/screenshots/html
+ServerName screen.capital.co
+ServerAdmin admin@capital.co
+ErrorLog /usr/local/screenshots/logs/error.log
+TransferLog /usr/local/screenshots/logs/access.log
+</VirtualHost>
+

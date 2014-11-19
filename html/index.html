@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Screenshots</title>
+<link href="base.css" rel="stylesheet" type="text/css" media="screen"/> 
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<meta http-equiv="Cache-Control" content="no-cache">
+<script type="text/javascript" src="swfobject.js"></script>
+<script type="text/javascript" src="vp.js"></script>
+</head>
+<body>
+<h3>Наблюдение</h3>
+<div id="main_display">
+<div id="config_bar" class="archive_bar">
+<form name="config" action="" onsubmit="return false">
+<select id="date_select" onchange="get_cameras();get_movies();">
+</select>
+<select id="camera_select" onchange="get_movies();">
+</select>
+<select id="mode_select" onchange="change_mode();">
+<option value='0'>Онлайн</option>
+<option value='1'>Архив</option>
+</select>
+</form>
+</div>
+<hr>
+<div id="display_html" class="archive_backdrop">
+<div id="playlist"></div>
+<div id="player"></div>
+</div>
+</div>
+<script type="text/javascript" src="index.js"></script>
+</body>
+</html>

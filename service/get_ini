@@ -1,0 +1,21 @@
+#!/bin/bash
+
+[[ -n "$1" ]] && INI_FILE="$1" || exit 1;
+[[ -n "$2" ]] && SECTION="$2" || exit 1;
+[[ -n "$3" ]] && PARAM="$3" || exit 1;
+
+function ini_get
+{
+    sed -e 's/[[:space:]]*\=[[:space:]]*/=/g' \
+            -e 's/;.*$//' \
+            -e 's/[[:space:]]*$//' \
+            -e 's/^[[:space:]]*//' \
+            -e "s/^\(.*\)=\([^\"']*\)$/\1=\2/" \
+            < "$INI_FILE" \
+            | sed -n -e "/^\["$1"\]/,/^\s*\[/{/^[^;].*\=.*/p;}" \
+            | sed -n -e "/^"$2"=/p;" \
+            | sed "s/^"$2"=//g" 2> /dev/null
+    return $?
+}
+
+ini_get $SECTION $PARAM && exit 0 || exit 1

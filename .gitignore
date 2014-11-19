@@ -1,7 +1,2 @@
-*.dcu
-*.exe
-*.log
-*.dof
-*.ddp
-*.cfg
-snapsrv.ini
+logs/
+config.ini

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+function get_ini_section
+{
+    [[ -n "$1" ]] && INI_FILE="$1" ||  return 1;
+    [[ -n "$2" ]] && SECTION="$2" || return 1;
+    cat $INI_FILE | sed -n "/^[[:space:]]*\[[[:space:]]*$SECTION[[:space:]]*\][[:space:]]*/,/^[[:space:]]*\[.*/p" | sed  '/^[[:space:]]*\[.*/d;/^$/d'
+    return $?
+}
+
+function get_ini_param
+{
+    [[ -n "$1" ]] && INI_FILE="$1" ||  return 1;
+    [[ -n "$2" ]] && PARAM="$2" || return 1;
+    if [[ -f "$INI_FILE" ]]; then
+        cat "$INI_FILE" | sed -n "/^[[:space:]]*$PARAM/{p;q}" | sed -r 's/.*=[[:space:]]*(.*)[[:space:]]*$/\1/'
+    else
+	echo "$INI_FILE" | sed -n "/^[[:space:]]*$PARAM/{p;q}" | sed -r 's/.*=[[:space:]]*(.*)[[:space:]]*$/\1/'
+    fi
+    
+    return $?
+}
+
+function get_ini_section_param
+{
+    [[ -n "$1" ]] && INI_FILE="$1" ||  return 1;
+    [[ -n "$2" ]] && SECTION="$2" || return 1;
+    [[ -n "$3" ]] && PARAM="$3" || return 1;
+    get_ini_param "$(get_ini_section $INI_FILE $SECTION)" $PARAM
+    return $?
+}
