@@ -8,9 +8,11 @@ rootdir=$(get_ini_section_param $INI_FILE Global rootdir)
 rootdir_limit_gb=$(get_ini_section_param $INI_FILE Global rootdir_limit_gb)
 must_free_days=$(get_ini_section_param $INI_FILE Global must_free_days)
 rootdir_size=`nice -n 19 du -sb $rootdir | sed -r 's/^([0-9]+)[[:space:]]+.*$/\1/'`
+echo "dir_size = $rootdir_size"
 count_days=`ls $roordir | wc -l`
 if [ ! $count_days -eq 0  ]; then
     avg_day_size=$(($rootdir_size/$count_days))
+    echo "avg_day_size = $avg_day_size"
     if [ ! $avg_day_size -eq 0 ]; then
         diff_value=$((( $rootdir_limit_gb*1024*1024*1024-$rootdir_size )/$avg_day_size ))
         if [ $diff_value -lt $must_free_days ]; then
