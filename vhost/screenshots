@@ -14,8 +14,8 @@ NameVirtualHost *:8102
     Options -Indexes
 </Directory>
 
-Alias /screenshots/ /mnt/kmotion/screenshots/
-<Directory "/mnt/kmotion/screenshots/">
+Alias /screenshots/ /mnt/screen/
+<Directory "/mnt/screen/">
     # secure login ...
     AuthType Basic
     

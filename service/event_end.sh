@@ -41,20 +41,7 @@ function make_video
 	mkdir -p `dirname $DEST`
 	logmsg "kmotion snapshots: make $FORMAT \"$DEST\""
 	
-	ffmpeg -n -pattern_type glob -r 2 -i "$QUERY/*.jpg" -c:v libx264 -preset ultrafast -profile:v baseline -level 3.0 -b:v 100k -qp 28 -an -r 25 $DEST &>/dev/null
-	
-	#if [[ ( $CTIME -gt $BTIME ) && ( $CTIME -lt $ETIME ) && ( $CDAYOFWEEK -lt 7 ) && ( ! -f $LOCK_FILE ) ]]; then
-	#/usr/bin/mencoder -v \
-	#-noskip \
-	#-mc 0 \
-	#-mf fps=$FPS:type=jpeg \
-	#-ovc lavc \
-	#-of lavf \
-	#-lavfopts format=flv \
-	#-lavcopts vcodec=flv:keyint=$FPS:vbitrate=100 \
-	#-oac copy \
-	#-nosound \
-	#-o $DEST mf://$QUERY/ &>/dev/null
+	cat $QUERY/*.jpg | avconv -f image2pipe -r 2 -c:v mjpeg -i - -c:v libx264 -preset ultrafast -profile:v baseline -b:v 100k -qp 28 -an -r 25 $DEST &> /dev/null
 	
 	[[ $? -eq 0 ]] && logmsg "kmotion snapshots: $FORMAT \"$DEST\" SUCCESS" || logmsg "kmotion snapshots: $FORMAT \"$DEST\" FAIL"
 	
