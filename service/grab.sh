@@ -22,7 +22,7 @@ function make_snapshot
     curnetcam_url=${netcam_urls[0]};
     while true; do
 	t1=$(date +%s.%N)
-	filename=$target_dir/$(date +"$snapshot_filename").jpg;
+	filename=$target_dir/$FEED/$(date +"$snapshot_filename").jpg;
 	mkdir -p `dirname $filename`
 	
 	wget -q -t 1 --timeout=$snapshot_interval -nc $USERPASSWD -O $filename $curnetcam_url &> /dev/null;
