@@ -41,7 +41,7 @@ function make_video
 	mkdir -p `dirname $DEST`
 	logmsg "kmotion snapshots: make $FORMAT \"$DEST\""
 	
-	cat $QUERY/*.jpg | avconv -f image2pipe -r 2 -c:v mjpeg -i - -c:v libx264 -preset ultrafast -profile:v baseline -b:v 100k -qp 28 -an -r 25 $DEST &> /dev/null
+	cat $QUERY/*.jpg | avconv -threads auto -f image2pipe -r 2 -c:v mjpeg -i - -c:v libx264 -preset ultrafast -profile:v baseline -b:v 100k -qp 28 -an -r 25 $DEST &> /dev/null
 	
 	[[ $? -eq 0 ]] && logmsg "kmotion snapshots: $FORMAT \"$DEST\" SUCCESS" || logmsg "kmotion snapshots: $FORMAT \"$DEST\" FAIL"
 	
