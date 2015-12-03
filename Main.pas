@@ -51,7 +51,7 @@ type
     function GetScreenshotToStream(quality: Integer): TStream;
     function IdHTTPServerStart: Integer;
     function IdHTTPServerStop: Integer;
-    function InstallSrv: Integer;
+    //function InstallSrv: Integer;
     //function GetNewVersion: Integer;
     //function CopyNewVersion: Integer;
   public
@@ -80,29 +80,29 @@ resourcestring
     '</head>' +
     '<body style="margin:auto; width:350px">' +
     '<form action="" method="post">' +
-    '<h1>Администрирование</h1>' +
+    '<h1>Administration</h1>' +
     '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
     '<tr><th width="100px" style="background-color:#f0f0f0">Порт</th><td><input type="text" name="port" size="14" value="{port}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Авторизация</th><td><input type="checkbox" name="useauth" value="ON" {useauth}></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Пользователь</th><td><input type="text" name="ausername" size="14" value="{ausername}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Пароль</th><td><input type="text" name="apassword" size="14" value="{apassword}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Индексный файл в корне</th><td><input type="text" name="indexfile" size="14" value="{indexfile}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Страница управления</th><td><input type="text" name="adminpage" size="14" value="{adminpage}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Администратор</th><td><input type="text" name="musername" size="14" value="{musername}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Пароль администратора</th><td><input type="text" name="mpassword" size="14" value="{mpassword}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Страница скриншота</th><td><input type="text" name="screenpage" size="14" value="{screenpage}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Качество скриншота</th><td><input type="text" name="jpgquality" size="14" value="{jpgquality}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Autorization</th><td><input type="checkbox" name="useauth" value="ON" {useauth}></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">User</th><td><input type="text" name="ausername" size="14" value="{ausername}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Password</th><td><input type="text" name="apassword" size="14" value="{apassword}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Index file in root</th><td><input type="text" name="indexfile" size="14" value="{indexfile}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Control page</th><td><input type="text" name="adminpage" size="14" value="{adminpage}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Administrator</th><td><input type="text" name="musername" size="14" value="{musername}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Admin password</th><td><input type="text" name="mpassword" size="14" value="{mpassword}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Screenshot page</th><td><input type="text" name="screenpage" size="14" value="{screenpage}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Screenshot quality</th><td><input type="text" name="jpgquality" size="14" value="{jpgquality}" style="width:100%"></td></tr>' +
     '</table>' +
     '<br>' +
     '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
-    '<tr><th>Команда</th><th>Параметры</th></tr>' +
+    '<tr><th>Команда</th><th>Parameters</th></tr>' +
     '<tr><td><textarea name="cmdtext" style="width:160px">{cmdtext}</textarea></td>' +
     '<td><textarea name="cmdparams" style="width:160px">{cmdparams}</textarea></td></tr>' +
     '</table>' +
-    '<div style="text-align:right">Запустить видимым&nbsp;&nbsp;<input type="checkbox" name="showcmd" value="ON">&nbsp;&nbsp;' +
-    '<button type="submit" name="execbtn" value="ON">Выполнить</button></div>' +
+    '<div style="text-align:right">Run visibility&nbsp;&nbsp;<input type="checkbox" name="showcmd" value="ON">&nbsp;&nbsp;' +
+    '<button type="submit" name="execbtn" value="ON">Run</button></div>' +
     '<br>' +
-    '<button type="submit" name="savereboot" value="ON">Применить/Перезагрузить</button>' +
+    '<button type="submit" name="savereboot" value="ON">Apply/Restart</button>' +
     '</form>' +
     '</body>' +
     '</html>';
@@ -156,14 +156,14 @@ begin
 end;
 
 
-function TMForm1.InstallSrv: Integer;
-var
-  aname: string;
-begin
-  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
-  ShellExecute(0, 'open', 'NETSH', PChar('firewall add allowedprogram program="' + Application.exeName + '" name=' + aname + ' mode=enable scope=all profile=all'), '', SW_HIDE);
-  ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
-end;
+//function TMForm1.InstallSrv: Integer;
+//var
+//  aname: string;
+//begin
+//  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
+//  ShellExecute(0, 'open', 'NETSH', PChar('firewall add allowedprogram program="' + Application.exeName + '" name=' + aname + ' mode=enable scope=all profile=all'), '', SW_HIDE);
+//  ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
+//end;
 
 
 procedure TMForm1.ApplicationException(Sender: TObject; E: Exception);
@@ -185,7 +185,7 @@ begin
       strlist.Values['.jpg'] := 'image/jpeg';
       IdHTTPServer1.MIMETable.LoadFromStrings(strlist);
       IdHTTPServer1.Active := True;
-      Button1.Caption := 'Остановить';
+      Button1.Caption := 'Stop';
       Button1.Tag := 2;
     except
       on e: Exception do
@@ -204,7 +204,7 @@ begin
       IdHTTPServer1.Active := False;
       IdHTTPServer1.Free;
       IdHTTPServer1 := nil;
-      Button1.Caption := 'Запустить';
+      Button1.Caption := 'Run';
       Button1.Tag := 1;
     end;
   except
@@ -428,8 +428,8 @@ begin
       iniPath := Copy(ParamStr(i), Length('config=') + 1, Length(ParamStr(i)) - Length('config='))
     else if ParamStr(i) = '-d' then
       d := true
-    else if ParamStr(i) = '/install' then
-      InstallSrv
+    //else if ParamStr(i) = '/install' then
+    //  InstallSrv
     else if Pos('help', ParamStr(i)) <> 0 then
     begin
       MessageBox(Handle, PChar('Usage: [log=logFile] | [config=configFile] | [-d] | [help]'), PChar(ExtractFileName(Application.ExeName) + ' v. ' + MForm1.Caption), MB_ICONQUESTION);

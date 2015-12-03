@@ -2,7 +2,7 @@ object MForm1: TMForm1
   Left = 365
   Top = 219
   BorderStyle = bsDialog
-  Caption = '1.3'
+  Caption = '1.4'
   ClientHeight = 417
   ClientWidth = 395
   Color = clBtnFace
@@ -19,9 +19,9 @@ object MForm1: TMForm1
   object Label1: TLabel
     Left = 98
     Top = 10
-    Width = 158
+    Width = 103
     Height = 16
-    Caption = #1040#1076#1084#1080#1085#1080#1089#1090#1088#1080#1088#1086#1074#1072#1085#1080#1077':'
+    Caption = 'Administration:'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
@@ -32,23 +32,23 @@ object MForm1: TMForm1
   object Label2: TLabel
     Left = 167
     Top = 42
-    Width = 31
+    Width = 23
     Height = 16
-    Caption = #1087#1086#1088#1090
+    Caption = 'port'
   end
   object Label3: TLabel
     Left = 167
     Top = 94
-    Width = 93
+    Width = 29
     Height = 16
-    Caption = #1087#1086#1083#1100#1079#1086#1074#1072#1090#1077#1083#1100
+    Caption = 'User'
   end
   object Label4: TLabel
     Left = 167
     Top = 123
-    Width = 47
+    Width = 60
     Height = 16
-    Caption = #1087#1072#1088#1086#1083#1100
+    Caption = 'Password'
   end
   object SpeedButton2: TSpeedButton
     Left = 128
@@ -61,44 +61,44 @@ object MForm1: TMForm1
   object Label6: TLabel
     Left = 167
     Top = 161
-    Width = 219
+    Width = 110
     Height = 16
-    Caption = #1080#1085#1076#1077#1082#1089#1085#1099#1081' '#1092#1072#1081#1083' '#1074' '#1087#1072#1087#1082#1077' '#1087#1088#1086#1077#1082#1090#1072
+    Caption = 'index file of project'
   end
   object Label7: TLabel
     Left = 167
     Top = 201
-    Width = 144
+    Width = 77
     Height = 16
-    Caption = #1089#1090#1088#1072#1085#1080#1094#1072' '#1091#1087#1088#1072#1074#1083#1077#1085#1080#1103
+    Caption = 'Control page'
   end
   object Label8: TLabel
     Left = 167
     Top = 233
-    Width = 201
+    Width = 78
     Height = 16
-    Caption = #1087#1086#1083#1100#1079#1086#1074#1072#1090#1077#1083#1100' '#1076#1083#1103' '#1091#1087#1088#1072#1074#1083#1077#1085#1080#1103
+    Caption = 'Administrator'
   end
   object Label9: TLabel
     Left = 167
     Top = 260
-    Width = 169
+    Width = 100
     Height = 16
-    Caption = #1087#1072#1088#1086#1083#1100' '#1076#1083#1103' '#1087#1086#1083#1100#1079#1086#1074#1072#1090#1077#1083#1103
+    Caption = 'Admin password'
   end
   object lbl1: TLabel
     Left = 167
     Top = 289
-    Width = 138
+    Width = 103
     Height = 16
-    Caption = #1089#1090#1088#1072#1085#1080#1094#1072'  '#1089#1082#1088#1080#1085#1096#1086#1090#1072
+    Caption = 'Screenshot page'
   end
   object lbl2: TLabel
     Left = 167
     Top = 319
-    Width = 134
+    Width = 110
     Height = 16
-    Caption = #1082#1072#1095#1077#1089#1090#1074#1086' '#1089#1082#1088#1080#1085#1096#1086#1090#1072
+    Caption = 'Screenshot quality'
   end
   object Edit1: TEdit
     Left = 10
@@ -121,7 +121,7 @@ object MForm1: TMForm1
     Top = 69
     Width = 208
     Height = 21
-    Caption = #1080#1089#1087#1086#1083#1100#1079#1086#1074#1072#1090#1100' '#1072#1074#1090#1086#1088#1080#1079#1072#1094#1080#1102
+    Caption = 'Use Auth'
     TabOrder = 2
   end
   object Edit3: TEdit
@@ -167,7 +167,7 @@ object MForm1: TMForm1
     Top = 364
     Width = 92
     Height = 31
-    Caption = #1047#1072#1087#1091#1089#1090#1080#1090#1100
+    Caption = 'Run'
     TabOrder = 8
     OnClick = Button1Click
   end
@@ -194,7 +194,7 @@ object MForm1: TMForm1
     Top = 364
     Width = 100
     Height = 31
-    Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
+    Caption = 'Save'
     TabOrder = 11
     OnClick = btn1Click
   end
