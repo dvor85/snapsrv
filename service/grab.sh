@@ -4,6 +4,7 @@ SELF_NAME=$(basename $0)
 [[ $(id -u) -eq 0 ]] && echo -e "\n$SELF_NAME cant be run as root\n" && exit 0
 
 export SCR_DIR=`readlink -f "$(dirname $0)/../"`;
+cd $SCR_DIR
 export INI_FILE="$SCR_DIR/service/config.ini"
 . $SCR_DIR/service/ini
 
