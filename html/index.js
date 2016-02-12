@@ -17,6 +17,8 @@ function get_xmlHttp_obj() {
 };
 
 function get_dates() {
+    var camera_select=document.getElementById('camera_select');	
+    
 	var xmlHttp = get_xmlHttp_obj();	
 	xmlHttp.open('GET', 'ajax.php' + '?get_date=1'+'&'+Math.random(), true);	
 	xmlHttp.onreadystatechange = function() {	
@@ -37,11 +39,13 @@ function get_dates() {
 	xmlHttp.send(null);
 	var mode_select=document.getElementById('mode_select');
 	mode_select.selectedIndex=0;
+    
 }	
 
-function get_cameras() {
+function get_cameras() {    
 	var xmlHttp = get_xmlHttp_obj();
-	
+	var camera_select=document.getElementById('camera_select');	
+    var selcam = (camera_select.selectedIndex>-1)?camera_select.selectedIndex:0;
 	xmlHttp.open('GET', 'ajax.php' + '?get_cameras=1'+'&'+Math.random(), true);	
 	xmlHttp.onreadystatechange = function() {	
 	if (xmlHttp.readyState == 4) {
@@ -54,11 +58,13 @@ function get_cameras() {
 			{						
 				html_data+='<option value="'+obj_data[i]["feed"]+'">'+obj_data[i]["title"]+'</option>';
 			}
-			document.getElementById('camera_select').innerHTML=html_data;
+			camera_select.innerHTML=html_data;
+            camera_select.selectedIndex=(selcam<camera_select.length)?selcam:0;
 		}
 	};	
 	}
 	xmlHttp.send(null);	
+    
 }
 
 var movies =[];
@@ -145,7 +151,7 @@ function get_movies() {
 		}
 	};	
 	}
-	xmlHttp.send(null);		
+	xmlHttp.send(null);
 	mode_select.selectedIndex=0;
 }
 
