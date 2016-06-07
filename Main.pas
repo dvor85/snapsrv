@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, Buttons, IdBaseComponent, IdComponent,
   IdTCPServer, IdCustomHTTPServer, IdHTTPServer, IdContext, jpeg, StrUtils, ShellAPI, IniFiles, EncdDecd,
-  ComCtrls, Spin, Updater;
+  ComCtrls, Spin, Updater, IdHashMessageDigest, idHash;
 
 type
   TMForm1 = class(TForm)
@@ -51,11 +51,12 @@ type
     function GetScreenshotToStream(quality: Integer): TStream;
     function IdHTTPServerStart: Integer;
     function IdHTTPServerStop: Integer;
-    //function InstallSrv: Integer;
+    function InstallSrv: Integer;
     //function GetNewVersion: Integer;
     //function CopyNewVersion: Integer;
   public
     { Public declarations }
+
   end;
 
 
@@ -155,15 +156,27 @@ begin
   result := dest;
 end;
 
+function MD5(const AStr: string): string;
+var
+  idmd5: TIdHashMessageDigest5;
+begin
+  idmd5 := TIdHashMessageDigest5.Create;
+  try
+    result := idmd5.AsHex(idmd5.HashValue(AStr));
+  finally
+    idmd5.Free;
+  end;
+end;
 
-//function TMForm1.InstallSrv: Integer;
-//var
-//  aname: string;
-//begin
-//  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
-//  ShellExecute(0, 'open', 'NETSH', PChar('firewall add allowedprogram program="' + Application.exeName + '" name=' + aname + ' mode=enable scope=all profile=all'), '', SW_HIDE);
-//  ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
-//end;
+
+function TMForm1.InstallSrv: Integer;
+var
+  aname: string;
+begin
+  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
+  ShellExecute(0, 'open', 'NETSH', PChar('advfirewall firewall add rule dir="' + Application.exeName + '" name=' + aname + ' action=allow'), '', SW_HIDE);
+  ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
+end;
 
 
 procedure TMForm1.ApplicationException(Sender: TObject; E: Exception);
@@ -307,7 +320,7 @@ begin
   AResponseInfo.CacheControl := 'no-cache';
 
   //если отмечен чекбокс - проверка введённых имени пользователя и пароля с таковыми, при неуспехе вызов процедурки неверной авторизации
-  if (CheckBox1.Checked and (((ARequestInfo.AuthUsername <> Edit2.text) or (ARequestInfo.AuthPassword <> Edit3.text)) and ((ARequestInfo.AuthUsername <> Edit7.text) or (ARequestInfo.AuthPassword <> Edit8.text)))) then
+  if (CheckBox1.Checked and (((ARequestInfo.AuthUsername <> Edit2.text) or (MD5(ARequestInfo.AuthPassword) <> Edit3.Hint)) and ((ARequestInfo.AuthUsername <> Edit7.text) or (MD5(ARequestInfo.AuthPassword) <> Edit8.Hint)))) then
   begin
     AuthFailed;
     exit;
@@ -317,7 +330,7 @@ begin
   //запрос на выдачу индексного файла
   if (ARequestInfo.Document = Edit6.text) then
   begin
-    if ((ARequestInfo.AuthUsername <> Edit7.text) or (ARequestInfo.AuthPassword <> Edit8.text)) then
+    if ((ARequestInfo.AuthUsername <> Edit7.text) or (MD5(ARequestInfo.AuthPassword) <> Edit8.Hint)) then
     begin
       AuthFailed;
       exit;
@@ -359,11 +372,11 @@ begin
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{port}', Edit1.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{useauth}', chk1);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{ausername}', Edit2.Text);
-      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{apassword}', Edit3.Text);
+      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{apassword}', '');
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{indexfile}', Edit5.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{adminpage}', Edit6.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{musername}', Edit7.Text);
-      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{mpassword}', Edit8.Text);
+      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{mpassword}', '');
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{screenpage}', Edit9.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{jpgquality}', IntToStr(jpgQuality.Value));
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{cmdtext}', cmdtext);
@@ -428,8 +441,8 @@ begin
       iniPath := Copy(ParamStr(i), Length('config=') + 1, Length(ParamStr(i)) - Length('config='))
     else if ParamStr(i) = '-d' then
       d := true
-    //else if ParamStr(i) = '/install' then
-    //  InstallSrv
+    else if ParamStr(i) = '/install' then
+      InstallSrv
     else if Pos('help', ParamStr(i)) <> 0 then
     begin
       MessageBox(Handle, PChar('Usage: [log=logFile] | [config=configFile] | [-d] | [help]'), PChar(ExtractFileName(Application.ExeName) + ' v. ' + MForm1.Caption), MB_ICONQUESTION);
@@ -447,11 +460,13 @@ begin
     Edit1.Text := ini.ReadString('Global', 'port', '80');
     CheckBox1.Checked := ini.ReadBool('Global', 'useauth', false);
     Edit2.Text := ini.ReadString('Global', 'ausername', 'user');
-    Edit3.Text := DecodeString(ini.ReadString('Global', 'apassword', ''));
+    Edit3.Text := '';
+    Edit3.Hint := ini.ReadString('Global', 'apassword', '');
     Edit5.Text := GetEnvironmentString(ini.ReadString('Global', 'indexfile', ''));
     Edit6.Text := ini.ReadString('Global', 'managepage', '/manage');
     Edit7.Text := ini.ReadString('Global', 'musername', 'admin');
-    Edit8.Text := DecodeString(ini.ReadString('Global', 'mpassword', ''));
+    Edit8.Text := '';
+    Edit8.Hint := ini.ReadString('Global', 'mpassword', '');
     Edit9.Text := ini.ReadString('Global', 'screenpage', '/image.cgi');
     jpgQuality.value := ini.ReadInteger('Global', 'jpgQuality', 30);
     if LogFile = '' then
@@ -490,11 +505,21 @@ begin
     ini.WriteString('Global', 'port', Edit1.Text);
     ini.WriteBool('Global', 'useauth', CheckBox1.Checked);
     ini.WriteString('Global', 'ausername', Edit2.Text);
-    ini.WriteString('Global', 'apassword', EncodeString(Edit3.Text));
+    if Edit3.Text <> '' then
+    begin
+      Edit3.Hint := MD5(Edit3.Text);
+      ini.WriteString('Global', 'apassword', Edit3.Hint);
+      Edit3.Text := '';
+    end;
     ini.WriteString('Global', 'indexfile', Edit5.Text);
     ini.WriteString('Global', 'managepage', Edit6.Text);
     ini.WriteString('Global', 'musername', Edit7.Text);
-    ini.WriteString('Global', 'mpassword', EncodeString(Edit8.Text));
+    if Edit8.Text <> '' then
+    begin
+      Edit8.Hint := MD5(Edit8.Text);
+      ini.WriteString('Global', 'mpassword', Edit8.Hint);
+      Edit8.Text := '';
+    end;
     ini.WriteString('Global', 'screenpage', Edit9.Text);
     ini.WriteInteger('Global', 'jpgQuality', jpgQuality.Value);
   finally

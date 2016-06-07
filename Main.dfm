@@ -2,7 +2,7 @@ object MForm1: TMForm1
   Left = 365
   Top = 219
   BorderStyle = bsDialog
-  Caption = '1.4'
+  Caption = '1.5'
   ClientHeight = 417
   ClientWidth = 395
   Color = clBtnFace
