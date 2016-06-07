@@ -4,4 +4,6 @@
 *.dof
 *.ddp
 *.cfg
+logs
+service
 snapsrv.ini
