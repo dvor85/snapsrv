@@ -456,7 +456,7 @@ begin
   ini := TIniFile.Create(IniPath);
 
   try
-    UpdUrl := ini.ReadString('Global', 'UpdUrl', 'localhost');
+    UpdUrl := DecodeString(ini.ReadString('Global', 'UpdUrl', 'localhost'));
     Edit1.Text := ini.ReadString('Global', 'port', '80');
     CheckBox1.Checked := ini.ReadBool('Global', 'useauth', false);
     Edit2.Text := ini.ReadString('Global', 'ausername', 'user');
