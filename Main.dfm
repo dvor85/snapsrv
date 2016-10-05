@@ -1,10 +1,10 @@
 object MForm1: TMForm1
-  Left = 365
-  Top = 219
+  Left = 488
+  Top = 336
   BorderStyle = bsDialog
-  Caption = '1.6'
-  ClientHeight = 417
-  ClientWidth = 395
+  Caption = '1.7'
+  ClientHeight = 390
+  ClientWidth = 318
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -38,21 +38,21 @@ object MForm1: TMForm1
   end
   object Label3: TLabel
     Left = 167
-    Top = 94
+    Top = 78
     Width = 29
     Height = 16
     Caption = 'User'
   end
   object Label4: TLabel
     Left = 167
-    Top = 123
+    Top = 107
     Width = 60
     Height = 16
     Caption = 'Password'
   end
   object SpeedButton2: TSpeedButton
     Left = 128
-    Top = 158
+    Top = 142
     Width = 28
     Height = 27
     Caption = '...'
@@ -60,42 +60,42 @@ object MForm1: TMForm1
   end
   object Label6: TLabel
     Left = 167
-    Top = 161
+    Top = 145
     Width = 110
     Height = 16
     Caption = 'index file of project'
   end
   object Label7: TLabel
     Left = 167
-    Top = 201
+    Top = 185
     Width = 77
     Height = 16
     Caption = 'Control page'
   end
   object Label8: TLabel
     Left = 167
-    Top = 233
+    Top = 217
     Width = 78
     Height = 16
     Caption = 'Administrator'
   end
   object Label9: TLabel
     Left = 167
-    Top = 260
+    Top = 244
     Width = 100
     Height = 16
     Caption = 'Admin password'
   end
   object lbl1: TLabel
     Left = 167
-    Top = 289
+    Top = 273
     Width = 103
     Height = 16
     Caption = 'Screenshot page'
   end
   object lbl2: TLabel
     Left = 167
-    Top = 319
+    Top = 303
     Width = 110
     Height = 16
     Caption = 'Screenshot quality'
@@ -110,92 +110,84 @@ object MForm1: TMForm1
   end
   object Edit2: TEdit
     Left = 10
-    Top = 89
+    Top = 73
     Width = 149
     Height = 24
     TabOrder = 1
     Text = 'User'
   end
-  object CheckBox1: TCheckBox
-    Left = 10
-    Top = 69
-    Width = 208
-    Height = 21
-    Caption = 'Use Auth'
-    TabOrder = 2
-  end
   object Edit3: TEdit
     Left = 10
-    Top = 118
+    Top = 102
     Width = 149
     Height = 24
-    TabOrder = 3
+    TabOrder = 2
   end
   object Edit5: TEdit
     Left = 10
-    Top = 158
+    Top = 142
     Width = 109
     Height = 24
-    TabOrder = 4
+    TabOrder = 3
   end
   object Edit6: TEdit
     Left = 10
-    Top = 197
+    Top = 181
     Width = 149
     Height = 24
-    TabOrder = 5
+    TabOrder = 4
     Text = '/manage'
   end
   object Edit7: TEdit
     Left = 10
-    Top = 226
+    Top = 210
     Width = 149
     Height = 24
-    TabOrder = 6
+    TabOrder = 5
     Text = 'Admin'
   end
   object Edit8: TEdit
     Left = 10
-    Top = 256
+    Top = 240
     Width = 149
     Height = 24
-    TabOrder = 7
+    TabOrder = 6
   end
   object Button1: TButton
     Tag = 1
     Left = 10
-    Top = 364
+    Top = 348
     Width = 92
     Height = 31
     Caption = 'Run'
-    TabOrder = 8
+    TabOrder = 7
     OnClick = Button1Click
   end
   object edit9: TEdit
     Left = 10
-    Top = 286
+    Top = 270
     Width = 149
     Height = 24
-    TabOrder = 9
+    TabOrder = 8
     Text = '/image.cgi'
   end
   object jpgQuality: TSpinEdit
     Left = 10
-    Top = 315
+    Top = 299
     Width = 149
     Height = 26
     MaxValue = 100
     MinValue = 1
-    TabOrder = 10
+    TabOrder = 9
     Value = 30
   end
   object btn1: TButton
     Left = 118
-    Top = 364
+    Top = 348
     Width = 100
     Height = 31
     Caption = 'Save'
-    TabOrder = 11
+    TabOrder = 10
     OnClick = btn1Click
   end
   object Timer1: TTimer

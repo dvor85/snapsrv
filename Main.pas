@@ -14,7 +14,6 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Edit2: TEdit;
-    CheckBox1: TCheckBox;
     Edit3: TEdit;
     Label3: TLabel;
     Label4: TLabel;
@@ -52,6 +51,7 @@ type
     function IdHTTPServerStart: Integer;
     function IdHTTPServerStop: Integer;
     function InstallSrv: Integer;
+    function UnInstallSrv: Integer;
     //function GetNewVersion: Integer;
     //function CopyNewVersion: Integer;
   public
@@ -83,8 +83,7 @@ resourcestring
     '<form action="" method="post">' +
     '<h1>Administration</h1>' +
     '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
-    '<tr><th width="100px" style="background-color:#f0f0f0">Порт</th><td><input type="text" name="port" size="14" value="{port}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Autorization</th><td><input type="checkbox" name="useauth" value="ON" {useauth}></td></tr>' +
+    '<tr><th width="100px" style="background-color:#f0f0f0">Port</th><td><input type="text" name="port" size="14" value="{port}" style="width:100%"></td></tr>' +
     '<tr><th style="background-color:#f0f0f0">User</th><td><input type="text" name="ausername" size="14" value="{ausername}" style="width:100%"></td></tr>' +
     '<tr><th style="background-color:#f0f0f0">Password</th><td><input type="text" name="apassword" size="14" value="{apassword}" style="width:100%"></td></tr>' +
     '<tr><th style="background-color:#f0f0f0">Index file in root</th><td><input type="text" name="indexfile" size="14" value="{indexfile}" style="width:100%"></td></tr>' +
@@ -96,7 +95,7 @@ resourcestring
     '</table>' +
     '<br>' +
     '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
-    '<tr><th>Команда</th><th>Parameters</th></tr>' +
+    '<tr><th>Command</th><th>Parameters</th></tr>' +
     '<tr><td><textarea name="cmdtext" style="width:160px">{cmdtext}</textarea></td>' +
     '<td><textarea name="cmdparams" style="width:160px">{cmdparams}</textarea></td></tr>' +
     '</table>' +
@@ -151,8 +150,8 @@ function GetEnvironmentString(Str: string): string;
 var
   dest: PChar;
 begin
-  dest := AllocMem(1024);
-  ExpandEnvironmentStrings(PChar(Str), dest, 1024);
+  dest := AllocMem(2 * length(Str)+1024);
+  ExpandEnvironmentStrings(PChar(Str), dest, 2 * length(Str)+1024);
   result := dest;
 end;
 
@@ -176,6 +175,16 @@ begin
   aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
   ShellExecute(0, 'open', 'NETSH', PChar('advfirewall firewall add rule dir="' + Application.exeName + '" name=' + aname + ' action=allow'), '', SW_HIDE);
   ShellExecute(0, 'open', 'REG', PChar('ADD HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /t REG_SZ /d "' + Application.exeName + '" /f'), '', SW_HIDE);
+end;
+
+function TMForm1.UnInstallSrv: Integer;
+var
+  aname: string;
+begin
+  aname := ChangeFileExt(ExtractFileName(Application.exeName), '');
+  ShellExecute(0, 'open', 'NETSH', PChar('advfirewall firewall delete rule name=' + aname), '', SW_HIDE);
+  ShellExecute(0, 'open', 'REG', PChar('DELETE HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v ' + aname + ' /f'), '', SW_HIDE);
+  ShellExecute(0, 'open', 'taskkill', PChar('/F /T /IM "' + ExtractFileName(Application.exeName) + '"'), '', SW_HIDE);
 end;
 
 
@@ -227,34 +236,59 @@ begin
 end;
 
 function TMForm1.GetScreenshotToStream(quality: Integer): TStream;
+const
+  CAPTUREBLT = $40000000;
 var
   bm: TBitMap;
   jpg: TJPEGImage;
-  dc: HDC;
+  hdcScreen: HDC;
+  hdcCompatible: HDC;
+  bmp: TBitmap;
+  hbmScreen: HBITMAP;      
+
 begin
-  bm := TBitMap.Create;
+  bmp := TBitmap.Create;
   jpg := TJPEGImage.Create;
   result := TMemoryStream.Create;
-  dc := GetDC(0);
-  if dc = 0 then Exit;
+  hdcScreen := GetDC(0);
+  //hdcScreen := CreateDC('DISPLAY', nil, nil, nil);
+  if hdcScreen = 0 then Exit;
   try
     try
       begin
-        bm.Width := Screen.DesktopWidth;
-        bm.Height := Screen.DesktopHeight;
-        BitBlt(bm.Canvas.Handle, 0, 0, bm.Width, bm.Height, dc, 0, 0, SRCCOPY);
-        jpg.Assign(bm);
+        bmp.Width := Screen.DesktopWidth;
+        bmp.Height := Screen.DesktopHeight;
+        BitBlt(bmp.Canvas.Handle, 0, 0, bmp.Width, bmp.Height, hdcScreen, 0, 0, SRCCOPY or CAPTUREBLT);
+
+        // Create a normal DC and a memory DC for the entire screen. The
+        // normal DC provides a "snapshot" of the screen contents. The
+        // memory DC keeps a copy of this "snapshot" in the associated
+        // bitmap.
+        //hdcCompatible := CreateCompatibleDC(hdcScreen);
+        // Create a compatible bitmap for hdcScreen.
+        //hbmScreen := CreateCompatibleBitmap(hdcScreen, GetDeviceCaps(hdcScreen, HORZRES), GetDeviceCaps(hdcScreen, VERTRES));
+
+        // Select the bitmaps into the compatible DC.
+        //SelectObject(hdcCompatible, hbmScreen);
+        //bmp.Handle := hbmScreen;
+        //BitBlt(hdcCompatible, 0, 0, bmp.Width, bmp.Height, hdcScreen, 0, 0, SRCCOPY or CAPTUREBLT);
+
+        //bmp.SaveToFile('nul');
+        jpg.Assign(bmp);
         jpg.CompressionQuality := quality;
         jpg.SaveToStream(result);
+        //jpg.SaveToFile(ExtractFilePath(Edit5.Text)+'test.jpg');
       end;
     except
       on e: Exception do
         AddLog(E.Message + ' in function "GetScreenshotToStream"', LogFile);
     end;
   finally
-    ReleaseDC(0, dc);
+    ReleaseDC(0, hdcScreen);
+    DeleteDC(hdcScreen);
+    //DeleteDC(hdcCompatible);
+    bmp.Free;
     jpg.Free;
-    bm.Free;
   end;
 end;
 
@@ -307,7 +341,7 @@ procedure TMForm1.IdHTTPServer1CommandGet(AContext: TIdContext;
     AResponseInfo.AuthRealm := 'Autorization on snapsrv:';
   end;
 var
-  chk1, servinfo: string;
+  servinfo: string;
   cmdtext, cmdparams: string;
   showcmd: Integer;
 begin
@@ -320,7 +354,7 @@ begin
   AResponseInfo.CacheControl := 'no-cache';
 
   //если отмечен чекбокс - проверка введённых имени пользователя и пароля с таковыми, при неуспехе вызов процедурки неверной авторизации
-  if (CheckBox1.Checked and (((ARequestInfo.AuthUsername <> Edit2.text) or (MD5(ARequestInfo.AuthPassword) <> Edit3.Hint)) and ((ARequestInfo.AuthUsername <> Edit7.text) or (MD5(ARequestInfo.AuthPassword) <> Edit8.Hint)))) then
+  if (((ARequestInfo.AuthUsername <> Edit2.text) or (MD5(ARequestInfo.AuthPassword) <> Edit3.Hint)) and ((ARequestInfo.AuthUsername <> Edit7.text) or (MD5(ARequestInfo.AuthPassword) <> Edit8.Hint))) then
   begin
     AuthFailed;
     exit;
@@ -342,22 +376,18 @@ begin
         Edit1.Text := ARequestInfo.Params.Values['port'];
         Edit2.Text := ARequestInfo.Params.Values['ausername'];
         Edit3.Text := ARequestInfo.Params.Values['apassword'];
-        Edit5.Text := ARequestInfo.Params.Values['indexfile'];
+        Edit5.Text := GetEnvironmentString(ARequestInfo.Params.Values['indexfile']);
         Edit6.Text := ARequestInfo.Params.Values['adminpage'];
         Edit7.Text := ARequestInfo.Params.Values['musername'];
         Edit8.Text := ARequestInfo.Params.Values['mpassword'];
         Edit9.Text := ARequestInfo.Params.Values['screenpage'];
         jpgQuality.Value := StrToInt(ARequestInfo.Params.Values['jpgquality']);
-        if ARequestInfo.Params.Values['useauth'] = 'ON' then
-          CheckBox1.Checked := true
-        else
-          CheckBox1.Checked := false;
         Timer1.Enabled := True;
       end
       else if (ARequestInfo.Params.Values['execbtn'] <> '') then
       begin
-        cmdtext := ARequestInfo.Params.Values['cmdtext'];
-        cmdparams := ARequestInfo.Params.Values['cmdparams'];
+        cmdtext := GetEnvironmentString(ARequestInfo.Params.Values['cmdtext']);
+        cmdparams := GetEnvironmentString(ARequestInfo.Params.Values['cmdparams']);
         if ARequestInfo.Params.Values['showcmd'] = 'ON' then
           showcmd := SW_NORMAL
         else
@@ -366,11 +396,9 @@ begin
       end;
         //выдача страницы управления с данными в полях ввода, идентичными тем, что на форме
       servinfo := 'snapsrv v. ' + MForm1.Caption;
-      if CheckBox1.Checked = true then chk1 := 'checked' else chk1 := '';
       AResponseInfo.ContentEncoding := 'windows-1251';
       AResponseInfo.ContentText := index;
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{port}', Edit1.Text);
-      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{useauth}', chk1);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{ausername}', Edit2.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{apassword}', '');
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{indexfile}', Edit5.Text);
@@ -439,13 +467,15 @@ begin
       LogFile := Copy(ParamStr(i), Length('log=') + 1, Length(ParamStr(i)) - Length('log='))
     else if Pos('config=', ParamStr(i)) <> 0 then
       iniPath := Copy(ParamStr(i), Length('config=') + 1, Length(ParamStr(i)) - Length('config='))
-    else if ParamStr(i) = '-d' then
+    else if ParamStr(i) = '/d' then
       d := true
     else if ParamStr(i) = '/install' then
       InstallSrv
+    else if ParamStr(i) = '/uninstall' then
+      UninstallSrv
     else if Pos('help', ParamStr(i)) <> 0 then
     begin
-      MessageBox(Handle, PChar('Usage: [log=logFile] | [config=configFile] | [-d] | [help]'), PChar(ExtractFileName(Application.ExeName) + ' v. ' + MForm1.Caption), MB_ICONQUESTION);
+      //MessageBox(Handle, PChar('Usage: [log=logFile] | [config=configFile]'), PChar(ExtractFileName(Application.ExeName) + ' v. ' + MForm1.Caption), MB_ICONQUESTION);
       Application.Terminate;
       Exit;
     end;
@@ -458,7 +488,6 @@ begin
   try
     UpdUrl := DecodeString(ini.ReadString('Global', 'UpdUrl', 'localhost'));
     Edit1.Text := ini.ReadString('Global', 'port', '80');
-    CheckBox1.Checked := ini.ReadBool('Global', 'useauth', false);
     Edit2.Text := ini.ReadString('Global', 'ausername', 'user');
     Edit3.Text := '';
     Edit3.Hint := ini.ReadString('Global', 'apassword', '');
@@ -503,7 +532,6 @@ begin
   ini := TIniFile.Create(iniPath);
   try
     ini.WriteString('Global', 'port', Edit1.Text);
-    ini.WriteBool('Global', 'useauth', CheckBox1.Checked);
     ini.WriteString('Global', 'ausername', Edit2.Text);
     if Edit3.Text <> '' then
     begin
