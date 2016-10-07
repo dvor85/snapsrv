@@ -19,6 +19,7 @@ type
     FLogFile: string;
     FUserName: string;
     FPassword: string;
+    FUpdateCmdParam: string;
     FTimer: TTimer;
     FUpdateInterval: cardinal;
     FSelfTimer: boolean;
@@ -35,6 +36,7 @@ type
     procedure SetCurrentVersion(const Value: string);
     procedure SetVersionIndexURI(const Value: string);
     function GetNewVersionNo: string;
+    procedure SetUpdateCmdParam(const Value: string);
     function GetEnvironmentString(Str: string): string;
 
   public
@@ -49,6 +51,7 @@ type
     property CurrentVersion: string read FCurVersion write SetCurrentVersion;
     property NewVersion: string read GetNewVersionNo write FNewVersion;
     property SelfTimer: boolean read FSelfTimer write SetSelfTimer;
+    property UpdateCmdParam: string read FUpdateCmdParam write SetUpdateCmdParam;
     property Checked: boolean read FChecked;
     property UpdateInterval: cardinal read FUpdateInterval write SetUpdateInterval;
   end;
@@ -90,9 +93,14 @@ function TUpdater.GetEnvironmentString(Str: string): string;
 var
   dest: PChar;
 begin
-  dest := AllocMem(1024);
-  ExpandEnvironmentStrings(PChar(Str), dest, 1024);
+  dest := AllocMem(2 * length(Str) + 1024);
+  ExpandEnvironmentStrings(PChar(Str), dest, 2 * length(Str) + 1024);
   result := dest;
+end;
+
+procedure TUpdater.SetUpdateCmdParam(const Value: string);
+begin
+  FUpdateCmdParam := LowerCase(Value);
 end;
 
 procedure TUpdater.SetCurrentVersion(const Value: string);
@@ -313,14 +321,16 @@ function TUpdater.UpdateSelfExe: integer;
 var
   p, i: integer;
   apName: string;
-  params: string;
+  param, params: string;
 begin
   p := Pos('tmp_', LowerCase(ExtractFileName(ParamStr(0))));
   if p <> 0 then
   begin
     Params := '';
     for i := 1 to ParamCount do
-      Params := ParamStr(i) + ' ';
+      param := LowerCase(ParamStr(i));
+    if param <> FUpdateCmdParam then
+      params := param + ' ';
     apName := copy(ExtractFileName(ParamStr(0)), p + length('tmp_'),
       Length(ExtractFileName(ParamStr(0))) - (p + length('tmp_')) + 1);
     if KillTask(LowerCase(apname)) = 0 then
@@ -388,9 +398,9 @@ function TUpdater.ProcessMessage: boolean;
             Result := True;
         end
         else
-        if (longword(GetWindowLong(Wnd, GWL_HINSTANCE)) = HInstance) then
-          if SendMessage(Wnd, CN_BASE + Message, WParam, LParam) <> 0 then
-            Result := True;
+          if (longword(GetWindowLong(Wnd, GWL_HINSTANCE)) = HInstance) then
+            if SendMessage(Wnd, CN_BASE + Message, WParam, LParam) <> 0 then
+              Result := True;
       end;
   end;
 
@@ -412,3 +422,4 @@ end;
 
 
 end.
+

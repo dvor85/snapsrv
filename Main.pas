@@ -79,25 +79,26 @@ resourcestring
     '<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">' +
     '<title>Administration</title>' +
     '</head>' +
-    '<body style="margin:auto; width:350px">' +
+    '<body style="margin:auto; width:450px">' +
     '<form action="" method="post">' +
-    '<h1>Administration</h1>' +
-    '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
-    '<tr><th width="100px" style="background-color:#f0f0f0">Port</th><td><input type="text" name="port" size="14" value="{port}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">User</th><td><input type="text" name="ausername" size="14" value="{ausername}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Password</th><td><input type="text" name="apassword" size="14" value="{apassword}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Index file in root</th><td><input type="text" name="indexfile" size="14" value="{indexfile}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Control page</th><td><input type="text" name="adminpage" size="14" value="{adminpage}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Administrator</th><td><input type="text" name="musername" size="14" value="{musername}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Admin password</th><td><input type="text" name="mpassword" size="14" value="{mpassword}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Screenshot page</th><td><input type="text" name="screenpage" size="14" value="{screenpage}" style="width:100%"></td></tr>' +
-    '<tr><th style="background-color:#f0f0f0">Screenshot quality</th><td><input type="text" name="jpgquality" size="14" value="{jpgquality}" style="width:100%"></td></tr>' +
+    '<h1>Administration: v.{version}</h1>' +
+    '<table width="100%" cellpadding="1px" cellspacing="1px" border="0">' +
+    '<tr><th width="100px" style="background-color:#f0f0f0">Self</th><td><input type="text" name="port" size="140" value="{self}" readonly style="width:100%"></td></td></tr>' +
+    '<tr><th width="100px" style="background-color:#f0f0f0">Port</th><td><input type="text" name="port" size="140" value="{port}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">User</th><td><input type="text" name="ausername" size="140" value="{ausername}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Password</th><td><input type="text" name="apassword" size="140" value="{apassword}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Index file in root</th><td><input type="text" name="indexfile" size="140" value="{indexfile}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Control page</th><td><input type="text" name="adminpage" size="140" value="{adminpage}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Administrator</th><td><input type="text" name="musername" size="140" value="{musername}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Admin password</th><td><input type="text" name="mpassword" size="140" value="{mpassword}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Screenshot page</th><td><input type="text" name="screenpage" size="140" value="{screenpage}" style="width:100%"></td></tr>' +
+    '<tr><th style="background-color:#f0f0f0">Screenshot quality</th><td><input type="text" name="jpgquality" size="140" value="{jpgquality}" style="width:100%"></td></tr>' +
     '</table>' +
     '<br>' +
     '<table width="330px" cellpadding="1px" cellspacing="1px" border="0">' +
     '<tr><th>Command</th><th>Parameters</th></tr>' +
-    '<tr><td><textarea name="cmdtext" style="width:160px">{cmdtext}</textarea></td>' +
-    '<td><textarea name="cmdparams" style="width:160px">{cmdparams}</textarea></td></tr>' +
+    '<tr><td><textarea name="cmdtext" style="width:150px">{cmdtext}</textarea></td>' +
+    '<td><textarea name="cmdparams" style="width:300px">{cmdparams}</textarea></td></tr>' +
     '</table>' +
     '<div style="text-align:right">Run visibility&nbsp;&nbsp;<input type="checkbox" name="showcmd" value="ON">&nbsp;&nbsp;' +
     '<button type="submit" name="execbtn" value="ON">Run</button></div>' +
@@ -150,8 +151,8 @@ function GetEnvironmentString(Str: string): string;
 var
   dest: PChar;
 begin
-  dest := AllocMem(2 * length(Str)+1024);
-  ExpandEnvironmentStrings(PChar(Str), dest, 2 * length(Str)+1024);
+  dest := AllocMem(2 * length(Str) + 1024);
+  ExpandEnvironmentStrings(PChar(Str), dest, 2 * length(Str) + 1024);
   result := dest;
 end;
 
@@ -244,7 +245,7 @@ var
   hdcScreen: HDC;
   hdcCompatible: HDC;
   bmp: TBitmap;
-  hbmScreen: HBITMAP;      
+  hbmScreen: HBITMAP;
 
 begin
   bmp := TBitmap.Create;
@@ -349,7 +350,7 @@ begin
   cmdparams := '';
 
  //версия сервера
-  AResponseInfo.Server := 'snapsrv v. 1.0';
+  AResponseInfo.Server := 'snapsrv v.' + MForm1.Caption;
   //запрет на кэширование в браузере
   AResponseInfo.CacheControl := 'no-cache';
 
@@ -395,9 +396,11 @@ begin
         ShellExecute(0, 'open', PChar(cmdtext), PChar(cmdparams), '', showcmd);
       end;
         //выдача страницы управления с данными в полях ввода, идентичными тем, что на форме
-      servinfo := 'snapsrv v. ' + MForm1.Caption;
+      servinfo := 'snapsrv v. ' + Caption;
       AResponseInfo.ContentEncoding := 'windows-1251';
       AResponseInfo.ContentText := index;
+      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{version}', Caption);
+      AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{self}', Application.ExeName);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{port}', Edit1.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{ausername}', Edit2.Text);
       AResponseInfo.ContentText := AnsiReplaceStr(AResponseInfo.ContentText, '{apassword}', '');
@@ -451,27 +454,35 @@ end;
 
 procedure TMForm1.FormCreate(Sender: TObject);
 var
-  d: Boolean;
+  d, u: Boolean;
   i: integer;
   User, pass: string;
-
+  param: string;
 begin
   Application.OnException := ApplicationException;
   Updater := TUpdater.Create;
   iniPath := '';
   LogFile := '';
+
   d := False;
+  u := False;
   for i := 1 to ParamCount do
   begin
-    if Pos('log=', ParamStr(i)) <> 0 then
-      LogFile := Copy(ParamStr(i), Length('log=') + 1, Length(ParamStr(i)) - Length('log='))
-    else if Pos('config=', ParamStr(i)) <> 0 then
-      iniPath := Copy(ParamStr(i), Length('config=') + 1, Length(ParamStr(i)) - Length('config='))
-    else if ParamStr(i) = '/d' then
+    param := LowerCase(ParamStr(i));
+    if Pos('log=', param) <> 0 then
+      LogFile := Copy(param, Length('log=') + 1, Length(param) - Length('log='))
+    else if Pos('config=', param) <> 0 then
+      iniPath := Copy(param, Length('config=') + 1, Length(param) - Length('config='))
+    else if param = '/d' then
       d := true
-    else if ParamStr(i) = '/install' then
+    else if param = '/update' then
+    begin
+      u := True;
+      Updater.UpdateCmdParam := param;
+    end
+    else if param = '/install' then
       InstallSrv
-    else if ParamStr(i) = '/uninstall' then
+    else if param = '/uninstall' then
       UninstallSrv
     else if Pos('help', ParamStr(i)) <> 0 then
     begin
@@ -525,6 +536,12 @@ begin
   Updater.UpdateInterval := 60000;
   Updater.LogFilename := LogFile;
   Updater.SelfTimer := true;
+
+  if u then
+  begin
+    Updater.NewVersion;
+    Updater.UpdateFiles;
+  end;
 end;
 
 procedure TMForm1.btn1Click(Sender: TObject);
