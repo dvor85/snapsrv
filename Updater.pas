@@ -38,6 +38,7 @@ type
     function GetNewVersionNo: string;
     procedure SetUpdateCmdParam(const Value: string);
     function GetEnvironmentString(Str: string): string;
+    function GetCmdparams: string;
 
   public
     constructor Create;
@@ -59,6 +60,7 @@ type
 implementation
 
 uses StrUtils, ShellProcess, ShellApi, Windows, Messages;
+
 
 constructor TUpdater.Create;
 var
@@ -89,6 +91,7 @@ begin
   FTimer.OnTimer := TimerProc;
 end;
 
+
 function TUpdater.GetEnvironmentString(Str: string): string;
 var
   dest: PChar;
@@ -98,10 +101,26 @@ begin
   result := dest;
 end;
 
+function TUpdater.GetCmdparams: string;
+var
+  i: Integer;
+  param: string;
+begin
+  result := '';
+  for i := 1 to ParamCount do
+  begin
+    param := LowerCase(ParamStr(i));
+    if param <> FUpdateCmdParam then
+      result := result + ' ' + param;
+  end;
+end;
+
+
 procedure TUpdater.SetUpdateCmdParam(const Value: string);
 begin
   FUpdateCmdParam := LowerCase(Value);
 end;
+
 
 procedure TUpdater.SetCurrentVersion(const Value: string);
 begin
@@ -109,11 +128,13 @@ begin
   IdHTTP.Request.UserAgent := ExtractFileName(ParamStr(0)) + ' v.' + FCurVersion;
 end;
 
+
 procedure TUpdater.SetVersionIndexURI(const Value: string);
 begin
   FVersionIndexURI := Value;
   IdHTTP.URL.URI := FVersionIndexURI;
 end;
+
 
 destructor TUpdater.Destroy;
 begin
@@ -123,17 +144,20 @@ begin
   FTimer.Free;
 end;
 
+
 procedure TUpdater.SetSelfTimer(const Value: boolean);
 begin
   FSelfTimer := Value;
   FTimer.Enabled := FSelfTimer;
 end;
 
+
 procedure TUpdater.TimerProc(Sender: TObject);
 begin
   if GetNewVersionNo > FCurVersion then
     UpdateFiles;
 end;
+
 
 procedure TUpdater.SplitStr(const Str: string; const Sym: string; var Data: TStrArray);
 var
@@ -169,11 +193,13 @@ begin
   end;
 end;
 
+
 procedure TUpdater.SetUpdateInterval(const Value: cardinal);
 begin
   FUpdateInterval := Value;
   FTimer.Interval := FUpdateInterval;
 end;
+
 
 procedure TUpdater.SetUserName(const Value: string);
 begin
@@ -190,8 +216,10 @@ begin
   IdHTTP.Request.Password := FPassword;
 end;
 
+
 function TUpdater.GetNewVersionNo: string;
 begin
+  if FVersionIndexURI <> '' then
   try
     try
       FFilesList.Text := IdHTTP.Get(FVersionIndexURI);
@@ -207,6 +235,7 @@ begin
     IdHTTP.Disconnect;
   end;
 end;
+
 
 function TUpdater.UpdateFiles: integer;
 var
@@ -305,7 +334,7 @@ begin
       if LowerCase(ExtractFileName(new_exe)) = LowerCase('tmp_' +
         ExtractFileName(ParamStr(0))) then
       begin
-        ShellExecute(0, 'open', PChar(new_exe), PChar(new_exe_param),
+        ShellExecute(0, 'open', PChar(new_exe), PChar(GetCmdparams + ' ' + new_exe_param),
           PChar(ExtractFilePath(new_exe)), SW_HIDE);
         ProcessTerminate(GetCurrentProcessId);
       end;
@@ -317,20 +346,15 @@ begin
   end;
 end;
 
+
 function TUpdater.UpdateSelfExe: integer;
 var
   p, i: integer;
   apName: string;
-  param, params: string;
 begin
   p := Pos('tmp_', LowerCase(ExtractFileName(ParamStr(0))));
   if p <> 0 then
   begin
-    Params := '';
-    for i := 1 to ParamCount do
-      param := LowerCase(ParamStr(i));
-    if param <> FUpdateCmdParam then
-      params := param + ' ';
     apName := copy(ExtractFileName(ParamStr(0)), p + length('tmp_'),
       Length(ExtractFileName(ParamStr(0))) - (p + length('tmp_')) + 1);
     if KillTask(LowerCase(apname)) = 0 then
@@ -338,10 +362,11 @@ begin
     CopyFile(PChar(ParamStr(0)), PChar(ExtractFilePath(ParamStr(0)) + apname), False);
 
     ShellExecute(0, 'open', PChar(ExtractFilePath(ParamStr(0)) + apname),
-      PChar(params), PChar(ExtractFilePath(ParamStr(0))), SW_HIDE);
+      PChar(GetCmdparams), PChar(ExtractFilePath(ParamStr(0))), SW_HIDE);
     ProcessTerminate(GetCurrentProcessId);
   end;
 end;
+
 
 procedure TUpdater.AddLog(LogString: string);
 var
@@ -377,6 +402,7 @@ begin
     F.Free;
   end;
 end;
+
 
 function TUpdater.ProcessMessage: boolean;
 
